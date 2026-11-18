@@ -8,8 +8,27 @@ on:
   workflow_dispatch:
 
 jobs:
+  pruebas:
+    name: Probar la página principal
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obtener el código
+        uses: actions/checkout@v4
+
+      # Instala PHP en el runner para ejecutar las pruebas
+      - name: Configurar PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      # Valida sintaxis y responde HTTP 200 con el contenido esperado
+      - name: Ejecutar pruebas de humo
+        run: bash tests/test-index.sh
+
   desplegar:
     name: Desplegar a FTP
+    needs: pruebas # Solo despliega si las pruebas pasan
     runs-on: ubuntu-latest
 
     steps:
@@ -29,5 +48,6 @@ jobs:
             **/.git*
             **/.git*/**
             .github/**
+            tests/**
             **/.vscode/**
             README.md
